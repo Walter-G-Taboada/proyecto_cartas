@@ -1,0 +1,34 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto">
+    <div class="mb-6">
+        <h2 class="text-2xl font-bold text-yellow-500">Editar Local: {{ local.nombre_local }}</h2>
+    </div>
+
+    <div class="bg-gray-800 p-8 rounded-lg border border-gray-700 shadow-2xl">
+        <form action="/actualizar_local" method="POST" class="space-y-6">
+            <input type="hidden" name="id_local" value="{{ local.id_local }}">
+
+            <div>
+                <label class="block text-sm text-gray-400 mb-2">Código del Local</label>
+                <input type="text" name="codigo" value="{{ local.codigo_local }}" required 
+                       class="w-full p-3 bg-gray-700 border border-gray-600 rounded text-white outline-none">
+            </div>
+
+            <div>
+                <label class="block text-sm text-gray-400 mb-2">Nombre del Local</label>
+                <input type="text" name="nombre" value="{{ local.nombre_local }}" required 
+                       class="w-full p-3 bg-gray-700 border border-gray-600 rounded text-white outline-none">
+            </div>
+
+            <div class="flex justify-between items-center pt-4">
+                <a href="/locales" class="text-gray-400 hover:text-white">Cancelar</a>
+                <button type="submit" class="bg-yellow-600 hover:bg-yellow-500 text-black px-8 py-2 rounded font-bold">
+                    Guardar Cambios
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

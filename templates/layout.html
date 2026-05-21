@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Gestión de Cartas - Baum</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-900 text-gray-100">
+    <nav class="bg-black border-b border-yellow-600 p-4 flex justify-between items-center shadow-md">
+        <h1 class="text-xl font-bold text-yellow-500">BAUM Cambio Cartas <span class="text-white font-light">| Panel</span></h1>
+        <div class="flex items-center gap-4">
+            <span class="text-sm bg-gray-800 px-3 py-1 rounded-full border border-gray-700">
+                Hola, <strong>{{ session['nombre_real'] }}</strong> ({{ session['rol'] }})
+            </span>
+            <a href="{{ url_for('auth.logout') }}" class="bg-red-800 hover:bg-red-600 text-white px-4 py-1 rounded font-bold text-sm transition">
+                Salir
+            </a>
+        </div>
+    </nav>
+
+    <div class="flex">
+        <aside class="w-64 bg-gray-800 h-screen p-6 hidden md:block border-r border-gray-700">
+            <ul class="space-y-4">
+                <li>
+                    <a href="{{ url_for('locales.dashboard') }}" class="block text-gray-300 hover:text-yellow-500 transition">
+                        📊 Locales (Dashboard)
+                    </a>
+                </li>
+                
+                <li>
+                    <a href="{{ url_for('locales.locales') }}" class="block text-yellow-600 font-bold hover:text-yellow-500 transition">
+                        🏢 Gestión Locales
+                    </a>
+                </li>
+                
+                <li>
+                    <a href="{{ url_for('productos.productos') }}" class="block text-gray-300 hover:text-yellow-500 transition">
+                        🍕 Platos / Productos
+                    </a>
+                </li>
+                
+                <li>
+                    <a href="{{ url_for('productos.rubros') }}" class="block text-gray-300 hover:text-yellow-500 transition">
+                        📂 Rubros
+                    </a>
+                </li>
+                
+                <li>
+                    <a href="{{ url_for('precios.central_listas_precios') }}" class="block text-gray-300 hover:text-yellow-500 flex items-center gap-2 transition">
+                        📋 Listas de Precios
+                    </a>
+                </li>
+            </ul>
+        </aside>
+
+        <main class="flex-1 p-8">
+            {% block content %}{% endblock %}
+        </main>
+    </div>
+</body>
+</html>
