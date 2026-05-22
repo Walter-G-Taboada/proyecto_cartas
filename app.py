@@ -3,6 +3,7 @@ from routes.auth import auth_bp
 from routes.locales import locales_bp
 from routes.productos import productos_bp
 from routes.precios import precios_bp
+from routes.categorias import categorias_bp
 
 app = Flask(__name__)
 app.secret_key = 'baum_secret_key_2026'
@@ -14,6 +15,7 @@ app.register_blueprint(auth_bp)
 app.register_blueprint(locales_bp)
 app.register_blueprint(productos_bp)
 app.register_blueprint(precios_bp)
+app.register_blueprint(categorias_bp)
 
 if __name__ == '__main__':
     # Tu app pasa de 583 líneas a menos de 20. ¡Una hermosura!

@@ -19,35 +19,50 @@
     </nav>
 
     <div class="flex">
-        <aside class="w-64 bg-gray-800 h-screen p-6 hidden md:block border-r border-gray-700">
-            <ul class="space-y-4">
+        <aside class="w-64 bg-gray-800 h-screen p-4 hidden md:block border-r border-gray-700">
+            <ul class="space-y-1">
                 <li>
-                    <a href="{{ url_for('locales.dashboard') }}" class="block text-gray-300 hover:text-yellow-500 transition">
-                        📊 Locales (Dashboard)
+                    <a href="{{ url_for('locales.dashboard') }}" 
+                       class="flex items-center gap-2 px-3 py-2 rounded transition-all duration-200 {% if request.endpoint == 'locales.dashboard' %}bg-gray-700 text-yellow-500 font-bold{% else %}text-gray-300 hover:bg-gray-700 hover:text-white{% endif %}">
+                        <span>📊</span> Locales (Dashboard)
                     </a>
                 </li>
                 
                 <li>
-                    <a href="{{ url_for('locales.locales') }}" class="block text-yellow-600 font-bold hover:text-yellow-500 transition">
-                        🏢 Gestión Locales
+                    <a href="{{ url_for('locales.locales') }}" 
+                       class="flex items-center gap-2 px-3 py-2 rounded transition-all duration-200 {% if request.endpoint == 'locales.locales' %}bg-gray-700 text-yellow-500 font-bold{% else %}text-gray-300 hover:bg-gray-700 hover:text-white{% endif %}">
+                        <span>🏢</span> Gestión Locales
                     </a>
                 </li>
                 
                 <li>
-                    <a href="{{ url_for('productos.productos') }}" class="block text-gray-300 hover:text-yellow-500 transition">
-                        🍕 Platos / Productos
+                    <a href="{{ url_for('productos.productos') }}" 
+                       class="flex items-center gap-2 px-3 py-2 rounded transition-all duration-200 {% if request.endpoint == 'productos.productos' %}bg-gray-700 text-yellow-500 font-bold{% else %}text-gray-300 hover:bg-gray-700 hover:text-white{% endif %}">
+                        <span>🍕</span> Platos / Productos
                     </a>
                 </li>
                 
                 <li>
-                    <a href="{{ url_for('productos.rubros') }}" class="block text-gray-300 hover:text-yellow-500 transition">
-                        📂 Rubros
+                    <a href="{{ url_for('productos.rubros') }}" 
+                       class="flex items-center gap-2 px-3 py-2 rounded transition-all duration-200 {% if request.endpoint == 'productos.rubros' %}bg-gray-700 text-yellow-500 font-bold{% else %}text-gray-300 hover:bg-gray-700 hover:text-white{% endif %}">
+                        <span>📂</span> Rubros
                     </a>
                 </li>
                 
                 <li>
-                    <a href="{{ url_for('precios.central_listas_precios') }}" class="block text-gray-300 hover:text-yellow-500 flex items-center gap-2 transition">
-                        📋 Listas de Precios
+                    <a href="{{ url_for('precios.central_listas_precios') }}" 
+                       class="flex items-center gap-2 px-3 py-2 rounded transition-all duration-200 {% if request.endpoint == 'precios.central_listas_precios' %}bg-gray-700 text-yellow-500 font-bold{% else %}text-gray-300 hover:bg-gray-700 hover:text-white{% endif %}">
+                        <span>📋</span> Listas de Precios
+                    </a>
+                </li>
+
+                <li>
+                    <a href="{{ url_for('categorias.dashboard_categorias') }}" 
+                       class="flex items-center gap-2 px-3 py-2 rounded transition-all duration-200 {% if request.endpoint == 'categorias.dashboard_categorias' %}bg-gray-700 text-yellow-500 font-bold{% else %}text-gray-300 hover:bg-gray-700 hover:text-white{% endif %}">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5 {% if request.endpoint == 'categorias.dashboard_categorias' %}text-yellow-500{% else %}text-gray-400{% endif %}">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M9.568 3H5.25A2.25 2.25 0 0 0 3 5.25v4.318c0 .597.237 1.17.659 1.591l9.581 9.581a1.447 1.447 0 0 0 2.047 0l4.318-4.318a1.447 1.447 0 0 0 0-2.047l-9.581-9.581a2.25 2.25 0 0 0-1.591-.659ZM6 7.5h.008v.008H6V7.5Z" />
+                        </svg>
+                        <span>Categorías Comerciales</span>
                     </a>
                 </li>
             </ul>
