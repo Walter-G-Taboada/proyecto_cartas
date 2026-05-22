@@ -1,17 +1,19 @@
 from flask import Blueprint, render_template, request, redirect, url_for
 from database.conection import get_db_connection
-from routes.auth import login_requerido
+from routes.auth import login_requerido,  requerir_roles
 import datetime
 
 precios_bp = Blueprint('precios', __name__)
 
 @precios_bp.route('/listas_precios')
 @login_requerido
+@requerir_roles(1, 2, 3)  # Todos pueden verlo peroeditarlo solo 1 y 2
 def central_listas_precios():
     return redirect(url_for('locales.dashboard'))
 
 @precios_bp.route('/local/<codigo_local>')
 @login_requerido
+@requerir_roles(1, 2, 3)  # Todos pueden verlo pero solo 1 y 2 pueden editar
 def ver_precios_local(codigo_local):
     hoy = datetime.date.today()
     mes_actual = request.args.get('mes_vigencia', hoy.strftime('%m-%Y'))
@@ -66,6 +68,7 @@ def ver_precios_local(codigo_local):
 
 @precios_bp.route('/guardar_precios_masivo', methods=['POST'])
 @login_requerido
+@requerir_roles(1, 2)  # 🔥 Solo deja pasar si session['rol'] == 1 y 2 (Admin) y Gerente
 def guardar_precios_masivo():
     id_local = request.form.get('id_local')
     mes_vigencia = request.form.get('mes_vigencia')

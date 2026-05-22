@@ -1,11 +1,12 @@
 from flask import Blueprint, render_template, request, redirect, url_for
 from database.conection import get_db_connection
-from routes.auth import login_requerido  # Importamos el decorador de seguridad
+from routes.auth import login_requerido, requerir_roles  # Importamos el decorador de seguridad
 
 locales_bp = Blueprint('locales', __name__)
 
 @locales_bp.route('/dashboard')
 @login_requerido
+@requerir_roles(1, 2, 3)  # 🔥 Solo deja pasar si session['rol'] == 1 y 2 (Admin) y Gerente
 def dashboard():
     db = get_db_connection()
     cursor = db.cursor(dictionary=True)
@@ -17,6 +18,7 @@ def dashboard():
 
 @locales_bp.route('/locales')
 @login_requerido
+@requerir_roles(1, 2)  # 🔥 Solo deja pasar si session['rol'] == 1 y 2 (Admin) y Gerente
 def locales():
     db = get_db_connection()
     cursor = db.cursor(dictionary=True)
@@ -28,6 +30,7 @@ def locales():
 
 @locales_bp.route('/guardar_local', methods=['POST'])
 @login_requerido
+@requerir_roles(1, 2)  # 🔥 Solo deja pasar si session['rol'] == 1 y 2 (Admin) y Gerente
 def guardar_local():
     codigo = request.form.get('codigo').upper()
     nombre = request.form.get('nombre')
@@ -44,6 +47,7 @@ def guardar_local():
 
 @locales_bp.route('/editar_local/<int:id_local>')
 @login_requerido
+@requerir_roles(1, 2)  # 🔥 Solo deja pasar si session['rol'] == 1 y 2 (Admin) y Gerente
 def editar_local(id_local):
     db = get_db_connection()
     cursor = db.cursor(dictionary=True)
@@ -54,6 +58,7 @@ def editar_local(id_local):
 
 @locales_bp.route('/actualizar_local', methods=['POST'])
 @login_requerido
+@requerir_roles(1, 2)  # 🔥 Solo deja pasar si session['rol'] == 1 y 2 (Admin) y Gerente
 def actualizar_local():
     id_local = request.form.get('id_local')
     codigo = request.form.get('codigo').upper()
@@ -71,6 +76,7 @@ def actualizar_local():
 
 @locales_bp.route('/cambiar_estado_local/<int:id_local>')
 @login_requerido
+@requerir_roles(1, 2)  # 🔥 Solo deja pasar si session['rol'] == 1 y 2 (Admin) y Gerente
 def cambiar_estado_local(id_local):
     db = get_db_connection()
     cursor = db.cursor(dictionary=True)

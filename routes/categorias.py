@@ -1,13 +1,14 @@
 # routes/categorias.py
 from flask import Blueprint, render_template, request, redirect, url_for
 from database.conection import get_db_connection  # Traemos tu función de conexión
-from routes.auth import login_requerido          # Tu decorador de seguridad
+from routes.auth import login_requerido, requerir_roles          # Tu decorador de seguridad
 
 categorias_bp = Blueprint('categorias', __name__)
 
 # --- RUTA: LISTAR Y CREAR CATEGORÍAS ---
 @categorias_bp.route('/dashboard/categorias', methods=['GET', 'POST'])
 @login_requerido
+@requerir_roles(1, 2)  # 🔥 Solo deja pasar si session['rol'] == 1 y 2 (Admin) y Gerente
 def dashboard_categorias():
     db = get_db_connection()
     cursor = db.cursor(dictionary=True) # dictionary=True para poder usar cat.id_categoria en el HTML
@@ -43,6 +44,7 @@ def dashboard_categorias():
 # --- RUTA: EDITAR CATEGORÍA ---
 @categorias_bp.route('/dashboard/categorias/editar/<int:id_cat>', methods=['GET', 'POST'])
 @login_requerido
+@requerir_roles(1, 2)  # 🔥 Solo deja pasar si session['rol'] == 1 y 2 (Admin) y Gerente
 def editar_categoria(id_cat):
     db = get_db_connection()
     cursor = db.cursor(dictionary=True)
@@ -78,6 +80,7 @@ def editar_categoria(id_cat):
 # --- RUTA: ELIMINAR CATEGORÍA ---
 @categorias_bp.route('/dashboard/categorias/eliminar/<int:id_cat>', methods=['POST'])
 @login_requerido
+@requerir_roles(1, 2)  # 🔥 Solo deja pasar si session['rol'] == 1 y 2 (Admin) y Gerente
 def eliminar_categoria(id_cat):
     db = get_db_connection()
     cursor = db.cursor()

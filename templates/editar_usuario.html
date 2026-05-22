@@ -1,0 +1,50 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="max-w-md mx-auto px-4 py-8">
+    <div class="bg-gray-800 p-6 rounded-lg border border-gray-700 shadow-xl">
+        <h2 class="text-xl font-bold text-yellow-500 mb-6 uppercase tracking-wider">
+            📝 Editar Usuario
+        </h2>
+
+        <form action="{{ url_for('usuarios.editar_usuario', id_user=usuario.id_usuario) }}" method="POST" class="space-y-4">
+            <div>
+                <label class="block text-xs text-gray-400 mb-1">Nombre de Usuario</label>
+                <input type="text" name="username" value="{{ usuario.username }}" required
+                       class="w-full p-2 bg-gray-700 border border-gray-600 rounded text-white text-sm outline-none focus:border-yellow-500 font-bold">
+            </div>
+
+            <div>
+                <label class="block text-xs text-gray-400 mb-1">Nueva Contraseña (Vacío para mantener la actual)</label>
+                <input type="password" name="password" placeholder="••••••••"
+                       class="w-full p-2 bg-gray-700 border border-gray-600 rounded text-white text-sm outline-none focus:border-yellow-500 font-bold">
+            </div>
+
+            <div>
+                <label class="block text-xs text-gray-400 mb-1">Rol del Usuario</label>
+                <select name="id_role" required class="w-full p-2 bg-gray-700 border border-gray-600 rounded text-white text-sm outline-none focus:border-yellow-500 font-bold">
+                    <option value="1" {% if usuario.id_role == 1 %}selected{% endif %}>Administrador</option>
+                    <option value="2" {% if usuario.id_role == 2 %}selected{% endif %}>Gerente</option>
+                    <option value="3" {% if usuario.id_role == 3 %}selected{% endif %}>Empleado</option>
+                </select>
+            </div>
+
+            <div class="flex items-center gap-2 py-2">
+                <input type="checkbox" name="activo" id="activo" value="1" {% if usuario.activo == 1 %}checked{% endif %}
+                       class="w-4 h-4 text-yellow-500 bg-gray-700 border-gray-600 rounded focus:ring-yellow-500">
+                <label for="activo" class="text-sm text-gray-300 font-semibold cursor-pointer">Usuario Habilitado / Activo</label>
+            </div>
+
+            <div class="flex gap-4 pt-2">
+                <a href="{{ url_for('usuarios.dashboard_usuarios') }}" 
+                   class="w-1/2 bg-gray-700 hover:bg-gray-600 text-center text-white font-bold py-2 px-4 rounded text-sm transition">
+                    ❌ Cancelar
+                </a>
+                <button type="submit" class="w-1/2 bg-yellow-600 hover:bg-yellow-500 text-black font-bold py-2 px-4 rounded text-sm transition shadow">
+                    💾 Guardar
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

@@ -1,6 +1,6 @@
 from flask import Blueprint, render_template, request, redirect, url_for
 from database.conection import get_db_connection
-from routes.auth import login_requerido
+from routes.auth import login_requerido, requerir_roles
 import datetime
 
 productos_bp = Blueprint('productos', __name__)
@@ -8,6 +8,7 @@ productos_bp = Blueprint('productos', __name__)
 # --- RUBROS ---
 @productos_bp.route('/rubros')
 @login_requerido
+@requerir_roles(1, 2)  # 🔥 Solo deja pasar si session['rol'] == 1 y 2 (Admin) y Gerente
 def rubros():
     db = get_db_connection()
     cursor = db.cursor(dictionary=True)
@@ -18,6 +19,7 @@ def rubros():
 
 @productos_bp.route('/guardar_rubro', methods=['POST'])
 @login_requerido
+@requerir_roles(1, 2)  # 🔥 Solo deja pasar si session['rol'] == 1 y 2 (Admin) y Gerente
 def guardar_rubro():
     nombre = request.form.get('nombre_rubro')
     db = get_db_connection()
@@ -33,6 +35,7 @@ def guardar_rubro():
 
 @productos_bp.route('/editar_rubro/<int:id_rubro>')
 @login_requerido
+@requerir_roles(1, 2)  # 🔥 Solo deja pasar si session['rol'] == 1 y 2 (Admin) y Gerente
 def editar_rubro(id_rubro):
     db = get_db_connection()
     cursor = db.cursor(dictionary=True)
@@ -43,6 +46,7 @@ def editar_rubro(id_rubro):
 
 @productos_bp.route('/actualizar_rubro', methods=['POST'])
 @login_requerido
+@requerir_roles(1, 2)  # 🔥 Solo deja pasar si session['rol'] == 1 y 2 (Admin) y Gerente
 def actualizar_rubro():
     id_rubro = request.form.get('id_rubro')
     nombre = request.form.get('nombre_rubro')
@@ -59,6 +63,7 @@ def actualizar_rubro():
 
 @productos_bp.route('/cambiar_estado_rubro/<int:id_rubro>')
 @login_requerido
+@requerir_roles(1, 2)  # 🔥 Solo deja pasar si session['rol'] == 1 y 2 (Admin) y Gerente
 def cambiar_estado_rubro(id_rubro):
     db = get_db_connection()
     cursor = db.cursor(dictionary=True)
@@ -74,6 +79,7 @@ def cambiar_estado_rubro(id_rubro):
 # --- PLATOS / PRODUCTOS ---
 @productos_bp.route('/productos')
 @login_requerido
+@requerir_roles(1, 2)  # 🔥 Solo deja pasar si session['rol'] == 1 y 2 (Admin) y Gerente
 def productos():
     db = get_db_connection()
     cursor = db.cursor(dictionary=True)
@@ -98,6 +104,7 @@ def productos():
 
 @productos_bp.route('/guardar_producto', methods=['POST'])
 @login_requerido
+@requerir_roles(1, 2)  # 🔥 Solo deja pasar si session['rol'] == 1 y 2 (Admin) y Gerente
 def guardar_producto():
     id_rubro = request.form.get('id_rubro')
     id_categoria = request.form.get('id_categoria')
@@ -124,6 +131,7 @@ def guardar_producto():
 
 @productos_bp.route('/editar_producto/<int:id>')
 @login_requerido
+@requerir_roles(1, 2)  # 🔥 Solo deja pasar si session['rol'] == 1 y 2 (Admin) y Gerente
 def editar_producto(id):
     db = get_db_connection()
     cursor = db.cursor(dictionary=True)
@@ -150,6 +158,7 @@ def editar_producto(id):
 
 @productos_bp.route('/actualizar_producto', methods=['POST'])
 @login_requerido
+@requerir_roles(1, 2)  # 🔥 Solo deja pasar si session['rol'] == 1 y 2 (Admin) y Gerente
 def actualizar_producto():
     id_producto = request.form.get('id_producto')
     id_rubro = request.form.get('id_rubro')
@@ -181,6 +190,7 @@ def actualizar_producto():
 
 @productos_bp.route('/borrar_producto/<int:id_producto>')
 @login_requerido
+@requerir_roles(1, 2)  # 🔥 Solo deja pasar si session['rol'] == 1 y 2 (Admin) y Gerente
 def borrar_producto(id_producto):
     db = get_db_connection()
     cursor = db.cursor()

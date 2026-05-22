@@ -1,0 +1,93 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <h2 class="text-2xl font-bold text-yellow-500 mb-6 uppercase tracking-wider">
+        👤 Gestión de Usuarios y Roles
+    </h2>
+
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+        <div class="lg:col-span-4 bg-gray-800 p-6 rounded-lg border border-gray-700 h-fit shadow-xl">
+            <h3 class="text-white font-semibold mb-4 text-sm uppercase text-gray-300">Nuevo Usuario</h3>
+            <form action="{{ url_for('usuarios.dashboard_usuarios') }}" method="POST" class="space-y-4">
+                <div>
+                    <label class="block text-xs text-gray-400 mb-1">Nombre de Usuario</label>
+                    <input type="text" name="username" required placeholder="Ej: wtaboada"
+                           class="w-full p-2 bg-gray-700 border border-gray-600 rounded text-white text-sm outline-none focus:border-yellow-500 font-bold">
+                </div>
+                <div>
+                    <label class="block text-xs text-gray-400 mb-1">Contraseña</label>
+                    <input type="password" name="password" required placeholder="••••••••"
+                           class="w-full p-2 bg-gray-700 border border-gray-600 rounded text-white text-sm outline-none focus:border-yellow-500 font-bold">
+                </div>
+                <div>
+                    <label class="block text-xs text-gray-400 mb-1">Rol del Usuario</label>
+                    <select name="id_role" required class="w-full p-2 bg-gray-700 border border-gray-600 rounded text-white text-sm outline-none focus:border-yellow-500 font-bold">
+                        {% for rol in roles %}
+                            <option value="{{ rol.id_role }}">{{ rol.nombre_role }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <button type="submit" class="w-full bg-yellow-600 hover:bg-yellow-500 text-black font-bold py-2 px-4 rounded text-sm transition shadow">
+                    ➕ Crear Usuario
+                </button>
+            </form>
+        </div>
+
+        <div class="lg:col-span-8 bg-gray-800 border border-gray-700 rounded-lg overflow-hidden shadow-xl">
+            <table class="w-full text-left table-fixed">
+                <thead class="bg-gray-700 text-yellow-500 text-xs uppercase tracking-wider">
+                    <tr>
+                        <th class="p-3 w-2/5">Usuario</th>
+                        <th class="p-3 w-1/4">Rol</th>
+                        <th class="p-3 w-1/6 text-center">Estado</th>
+                        <th class="p-3 w-1/6 text-center">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-700 text-sm text-gray-300">
+                    {% if usuarios %}
+                        {% for user in usuarios %}
+                        <tr class="hover:bg-gray-750 transition">
+                            <td class="p-3 font-semibold text-white">
+                                {{ user.username }}
+                            </td>
+                            <td class="p-3">
+                                <span class="px-2 py-1 rounded text-xs font-bold uppercase bg-gray-700 text-yellow-400 border border-gray-600">
+                                    {{ user.nombre_role }}
+                                </span>
+                            </td>
+                            <td class="p-3 text-center">
+                                {% if user.activo == 1 %}
+                                    <span class="text-green-500 font-bold text-xs bg-green-950 px-2 py-0.5 rounded border border-green-800">Activo</span>
+                                {% else %}
+                                    <span class="text-red-400 font-bold text-xs bg-red-950 px-2 py-0.5 rounded border border-red-900">Suspendido</span>
+                                {% endif %}
+                            </td>
+                            <td class="p-3 text-center">
+                                <div class="flex items-center justify-center gap-4">
+                                    <a href="{{ url_for('usuarios.editar_usuario', id_user=user.id_usuario) }}" title="Editar" class="text-green-500 hover:text-green-400 font-bold text-lg">
+                                        📝
+                                    </a>
+                                    <form action="{{ url_for('usuarios.eliminar_usuario', id_user=user.id_usuario) }}" method="POST" 
+                                          onsubmit="return confirm('¿Seguro que querés eliminar este usuario?');" class="inline m-0 p-0">
+                                        <button type="submit" title="Eliminar" class="text-red-500 hover:text-red-400 font-bold text-lg cursor-pointer">
+                                            🗑️
+                                        </button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    {% else %}
+                        <tr>
+                            <td colspan="4" class="p-8 text-center text-gray-500 italic">
+                                No hay usuarios creados todavía.
+                            </td>
+                        </tr>
+                    {% endif %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

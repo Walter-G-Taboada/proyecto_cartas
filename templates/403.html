@@ -1,0 +1,27 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="flex flex-col items-center justify-center min-h-[60vh] text-center px-4">
+    
+    <div class="mb-6 max-w-sm">
+        <img src="https://media1.giphy.com/media/v1.Y2lkPTc5MGI3NjExdXk2b2tqMGNsdnZmM2JvaHN4bDdkdjZtcG96ajRjMXc0cnNxbTdpZSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/26ybwvTX4DTkwst6U/giphy.gif" 
+             alt="Acceso Denegado Baum" 
+             class="rounded-lg shadow-2xl border border-red-700/30 max-w-full h-auto">
+    </div>
+
+    <h1 class="text-3xl font-black text-red-500 uppercase tracking-wider">
+        Acceso Restringido
+    </h1>
+    
+    <p class="text-gray-400 mt-3 max-w-md font-medium">
+        Tu usuario actual (<strong class="text-yellow-500">{{ session['nombre_real'] }}</strong>) no cuenta con los permisos jerárquicos para realizar modificaciones en esta sección.
+    </p>
+
+    <div class="mt-8">
+        <a href="{{ url_for('locales.dashboard') }}" 
+           class="inline-flex items-center gap-2 bg-yellow-600 hover:bg-yellow-500 text-black font-extrabold py-3 px-6 rounded-lg shadow-md transition-all duration-200 transform hover:scale-105 text-sm uppercase">
+            ↩️ Volver al Panel Principal
+        </a>
+    </div>
+</div>
+{% endblock %}
