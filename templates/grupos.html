@@ -1,0 +1,201 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="max-w-6xl mx-auto px-4 py-8">
+    <h2 class="text-2xl font-bold text-yellow-500 mb-6 uppercase tracking-wider">
+        🏢 Gestión de Grupos de Locales
+    </h2>
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        
+        {% if session['rol'] in [1, 2] %}
+        <div class="bg-gray-800 border border-gray-700 rounded-lg p-6 h-fit shadow-xl">
+            <h3 class="text-lg font-semibold text-white mb-4">Crear Nuevo Grupo</h3>
+            <form action="{{ url_for('grupos.guardar_grupo') }}" method="POST" class="space-y-4">
+                <div>
+                    <label class="block text-xs text-gray-400 uppercase font-bold mb-1">Nombre del Grupo</label>
+                    <input type="text" name="nombre_grupo" placeholder="Ej: Mar del Plata o Franquicias" required
+                           class="w-full p-2.5 bg-gray-700 border border-gray-600 rounded text-sm text-white focus:outline-none focus:border-yellow-500">
+                </div>
+                <div>
+                    <label class="block text-xs text-gray-400 uppercase font-bold mb-1">Descripción / Notas</label>
+                    <textarea name="descripcion" placeholder="Zonas que comparten precios de carta regular..." rows="2"
+                              class="w-full p-2.5 bg-gray-700 border border-gray-600 rounded text-sm text-white focus:outline-none focus:border-yellow-500"></textarea>
+                </div>
+
+                <div>
+                    <label class="block text-xs text-gray-400 uppercase font-bold mb-2">Incluir Sucursales:</label>
+                    <div class="space-y-2 max-h-48 overflow-y-auto bg-gray-900/50 border border-gray-700 p-3 rounded src-fallback-scroll">
+                        {% for local in locales_disponibles %}
+                        <label class="flex items-center gap-3 p-1.5 hover:bg-gray-700/50 rounded cursor-pointer transition">
+                            <input type="checkbox" name="locales_seleccionados" value="{{ local.id_local }}" 
+                                   class="w-4 h-4 rounded text-yellow-600 bg-gray-700 border-gray-600 focus:ring-0 focus:ring-offset-0 checked:bg-yellow-600">
+                            <div class="text-sm">
+                                <span class="text-white font-medium block">{{ local.nombre_local }}</span>
+                                <span class="text-[11px] text-gray-500 font-mono uppercase">{{ local.codigo_local }}</span>
+                            </div>
+                        </label>
+                        {% endfor %}
+                        
+                        {% if not locales_disponibles %}
+                        <p class="text-xs text-gray-500 italic p-2 text-center">No hay locales disponibles para asignar.</p>
+                        {% endif %}
+                    </div>
+                    <p class="text-[10px] text-gray-500 mt-1.5">Las sucursales seleccionadas adoptarán la estrategia de precios unificada de este grupo.</p>
+                </div>
+
+                <button type="submit" class="w-full bg-yellow-600 hover:bg-yellow-500 text-black font-bold py-2.5 px-4 rounded text-sm uppercase transition shadow-md tracking-wider">
+                    ➕ Guardar Grupo y Asignar
+                </button>
+            </form>
+        </div>
+        {% endif %}
+
+        <div class="lg:col-span-2 bg-gray-800 border border-gray-700 rounded-lg overflow-hidden shadow-xl h-fit">
+            <table class="w-full text-left table-fixed">
+                <thead class="bg-gray-700 text-yellow-500 text-xs uppercase tracking-wider">
+                    <tr>
+                        <th class="p-3 w-1/3">Grupo de Ventas</th>
+                        <th class="p-3 w-1/2">Descripción</th>
+                        <th class="p-3 w-1/6 text-center">Locales</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-700 text-sm text-gray-300">
+                    {% for gp in grupos %}
+                    <tr class="hover:bg-gray-750 cursor-pointer transition" 
+                        onclick="abrirModalEditar('{{ gp.id_grupo }}', '{{ gp.nombre_grupo | escape }}', '{{ (gp.descripcion or '') | escape }}', '{{ gp.ids_locales_asociados or '' }}')">
+                        <td class="p-3 font-semibold text-white">
+                            <div class="flex items-center gap-2">
+                                <span class="text-gray-500 text-base">📂</span>
+                                {{ gp.nombre_grupo }}
+                            </div>
+                        </td>
+                        <td class="p-3 text-gray-400 align-middle truncate">{{ gp.descripcion or 'Sin descripción' }}</td>
+                        <td class="p-3 text-center align-middle">
+                            <span class="bg-blue-900/40 text-blue-400 border border-blue-700/50 px-2.5 py-0.5 rounded-full font-mono text-xs font-bold">
+                                {{ gp.cantidad_locales }}
+                            </span>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                    {% if not grupos %}
+                    <tr>
+                        <td colspan="3" class="p-4 text-center text-gray-500 italic">No hay grupos configurados todavía.</td>
+                    </tr>
+                    {% endif %}
+                </tbody>
+            </table>
+        </div>
+
+    </div>
+</div>
+
+<div id="modalEditarGrupo" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center hidden opacity-0 transition-opacity duration-300">
+    <div class="bg-gray-800 border border-gray-700 w-full max-w-lg rounded-lg shadow-2xl overflow-hidden transform scale-95 transition-transform duration-300">
+        
+        <div class="bg-gray-700 px-6 py-4 flex items-center justify-between border-b border-gray-600">
+            <h3 class="text-lg font-bold text-yellow-500 uppercase tracking-wide">
+                📝 Modificar Grupo de Locales
+            </h3>
+            <button onclick="cerrarModalEditar()" class="text-gray-400 hover:text-white font-bold text-xl focus:outline-none">&times;</button>
+        </div>
+
+        <form action="{{ url_for('grupos.actualizar_grupo') }}" method="POST" class="p-6 space-y-4">
+            <input type="hidden" id="edit_id_grupo" name="id_grupo">
+
+            <div>
+                <label class="block text-xs text-gray-400 uppercase font-bold mb-1">Nombre del Grupo</label>
+                <input type="text" id="edit_nombre_grupo" name="nombre_grupo" required
+                       class="w-full p-2.5 bg-gray-700 border border-gray-600 rounded text-sm text-white focus:outline-none focus:border-yellow-500">
+            </div>
+
+            <div>
+                <label class="block text-xs text-gray-400 uppercase font-bold mb-1">Descripción / Notas</label>
+                <textarea id="edit_descripcion" name="descripcion" rows="2"
+                          class="w-full p-2.5 bg-gray-700 border border-gray-600 rounded text-sm text-white focus:outline-none focus:border-yellow-500"></textarea>
+            </div>
+
+            <div>
+                <label class="block text-xs text-gray-400 uppercase font-bold mb-2">Locales Incluidos en este Grupo:</label>
+                <div class="space-y-2 max-h-48 overflow-y-auto bg-gray-900/50 border border-gray-700 p-3 rounded src-fallback-scroll">
+                    {% for local in locales_disponibles %}
+                    <label class="flex items-center gap-3 p-1.5 hover:bg-gray-700/50 rounded cursor-pointer transition">
+                        <input type="checkbox" name="locales_seleccionados" value="{{ local.id_local }}" data-modal-local-id="{{ local.id_local }}"
+                               class="w-4 h-4 rounded text-yellow-600 bg-gray-700 border-gray-600 focus:ring-0 focus:ring-offset-0 checked:bg-yellow-600">
+                        <div class="text-sm">
+                            <span class="text-white font-medium block">{{ local.nombre_local }}</span>
+                            <span class="text-[11px] text-gray-500 font-mono uppercase">{{ local.codigo_local }}</span>
+                        </div>
+                    </label>
+                    {% endfor %}
+                </div>
+                <p class="text-[10px] text-gray-500 mt-1.5">Tildá o destildá locales para agregarlos o removerlos de este grupo de precios.</p>
+            </div>
+
+            <div class="flex gap-3 pt-2 border-t border-gray-700">
+                <button type="button" onclick="cerrarModalEditar()" class="w-1/3 bg-gray-700 hover:bg-gray-600 text-white font-bold py-2 rounded text-sm uppercase transition">
+                    Cancelar
+                </button>
+                <button type="submit" class="w-2/3 bg-yellow-600 hover:bg-yellow-500 text-black font-bold py-2 rounded text-sm uppercase transition shadow-md tracking-wider">
+                    💾 Guardar Cambios
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+function abrirModalEditar(id, nombre, descripcion, idsAsociados) {
+    const modal = document.getElementById('modalEditarGrupo');
+    
+    // Asignamos los valores básicos a los inputs del modal
+    document.getElementById('edit_id_grupo').value = id;
+    document.getElementById('edit_nombre_grupo').value = nombre;
+    document.getElementById('edit_descripcion').value = descripcion;
+
+    // Convertimos la cadena de IDs separados por coma a un array de enteros (Ej: "1,3" -> [1, 3])
+    // Si viene vacío, creamos un array vacío
+    const arrayIds = idsAsociados ? idsAsociados.split(',').map(Number) : [];
+
+    // Buscamos todos los checkboxes dentro del modal
+    const checkboxes = document.querySelectorAll('input[data-modal-local-id]');
+    
+    checkboxes.forEach(cb => {
+        const localId = Number(cb.getAttribute('data-modal-local-id'));
+        // Si el ID del local está incluido en la lista de asociados del grupo, lo tildamos, sino lo limpiamos
+        cb.checked = arrayIds.includes(localId);
+    });
+
+    // Desplegamos el modal con transición limpia de Tailwind
+    modal.classList.remove('hidden');
+    setTimeout(() => {
+        modal.classList.remove('opacity-0');
+        modal.querySelector('.transform').classList.remove('scale-95');
+    }, 10);
+}
+
+function cerrarModalEditar() {
+    const modal = document.getElementById('modalEditarGrupo');
+    modal.classList.add('opacity-0');
+    modal.querySelector('.transform').classList.add('scale-95');
+    setTimeout(() => {
+        modal.classList.add('hidden');
+    }, 300);
+}
+
+// Cerrar el modal de forma limpia si el usuario hace clic fuera de la caja
+window.onclick = function(event) {
+    const modal = document.getElementById('modalEditarGrupo');
+    if (event.target === modal) {
+        cerrarModalEditar();
+    }
+}
+</script>
+
+<style>
+    .src-fallback-scroll::-webkit-scrollbar { width: 6px; }
+    .src-fallback-scroll::-webkit-scrollbar-track { background: rgba(0,0,0,0.1); }
+    .src-fallback-scroll::-webkit-scrollbar-thumb { background: #4B5563; border-radius: 4px; }
+    .src-fallback-scroll::-webkit-scrollbar-thumb:hover { background: #D97706; }
+</style>
+{% endblock %}

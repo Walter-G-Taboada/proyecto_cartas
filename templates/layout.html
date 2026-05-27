@@ -79,6 +79,17 @@
                 </li>
                 {% endif %}
 
+                {% if session['rol'] in [1, 2] %}
+                <li>
+                    <a href="{{ url_for('grupos.listar_grupos') }}" 
+                       class="flex items-center gap-2 px-3 py-2 rounded transition-all duration-200 {% if request.endpoint == 'productos.rubros' %}bg-gray-700 text-yellow-500 font-bold{% else %}text-gray-300 hover:bg-gray-700 hover:text-white{% endif %}">
+                        <span>🗺️</span> Grupos Franquicias
+                    </a>
+                </li>
+                {% endif %}
+
+
+
 
 
                {% if session['rol'] in [1, 2] %}

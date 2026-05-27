@@ -13,11 +13,24 @@
             </p>
         </div>
         
-        <div class="bg-gray-800 p-3 rounded-lg border border-gray-700 flex items-center gap-3 shadow-md">
+        <div class="bg-gray-800 p-3 rounded-lg border border-gray-700 flex flex-wrap items-center gap-3 shadow-md no-print">
+            
+            <a href="{{ url_for('precios.exportar_excel', codigo_local=local.codigo_local, mes_vigencia=mes_actual) }}" 
+               class="flex items-center gap-2 bg-emerald-700 hover:bg-emerald-600 text-white font-bold py-2 px-3 rounded text-xs uppercase transition shadow shadow-emerald-900/50">
+                📊 Excel
+            </a>
+            
+            <button onclick="window.print()" type="button"
+                    class="flex items-center gap-2 bg-rose-700 hover:bg-rose-600 text-white font-bold py-2 px-3 rounded text-xs uppercase transition shadow shadow-rose-900/50">
+                📄 PDF
+            </button>
+
+            <div class="w-px h-6 bg-gray-700 mx-1"></div>
+
             <label class="text-sm text-gray-300 font-medium">Historial:</label>
-            <form method="GET" action="/local/{{ local.codigo_local }}" id="form-periodo">
+            <form method="GET" action="/local/{{ local.codigo_local }}" id="form-periodo" class="m-0">
                 <select name="mes_vigencia" onchange="document.getElementById('form-periodo').submit();"
-                        class="p-2 bg-gray-700 border border-gray-600 rounded text-white font-semibold outline-none focus:border-yellow-500 cursor-pointer">
+                        class="p-2 bg-gray-700 border border-gray-600 rounded text-white font-semibold outline-none focus:border-yellow-500 cursor-pointer text-xs">
                     {% for mes in historial_meses %}
                         <option value="{{ mes }}" {% if mes == mes_actual %}selected{% endif %}>
                             {{ mes }}
@@ -28,7 +41,7 @@
         </div>
     </div>
 
-    <div id="panel-incrementos" class="bg-gray-800 border-l-4 border-yellow-500 p-4 rounded-r-lg border border-gray-700 mb-6 shadow-lg">
+    <div id="panel-incrementos" class="bg-gray-800 border-l-4 border-yellow-500 p-4 rounded-r-lg border border-gray-700 mb-6 shadow-lg no-print">
         <h4 class="text-white font-semibold mb-3 flex items-center gap-2 text-sm uppercase tracking-wider">
             ⚡ Herramientas de Ajuste Masivo para el Mes Vigente
         </h4>
@@ -43,7 +56,7 @@
                         {% for producto in productos %}
                             {% if producto.id_rubro not in rubros_vistos and producto.id_rubro is not none %}
                                 <option value="{{ producto.id_rubro }}">{{ producto.nombre_rubro or 'Sin Rubro' }}</option>
-                                {% set _ = rubros_vistos.append(producto.id_rubro) %}
+                                {% if rubros_vistos.append(producto.id_rubro) %}{% endif %}
                             {% endif %}
                         {% endfor %}
                     {% endif %}
@@ -104,69 +117,69 @@
         </div>
     </div>
 
-    <div class="bg-gray-800 border border-gray-700 rounded-lg overflow-hidden shadow-xl mb-24">
+    <div class="bg-gray-800 border border-gray-700 rounded-lg overflow-hidden shadow-xl mb-24 printable-area">
         <form action="/guardar_precios_masivo" method="POST">
             <input type="hidden" name="id_local" value="{{ local.id_local }}">
             <input type="hidden" name="mes_vigencia" value="{{ mes_actual }}">
             <input type="hidden" name="codigo_local" value="{{ local.codigo_local }}">
 
-            <table class="w-full text-left table-fixed">
-                <thead class="bg-gray-700 text-yellow-500 text-xs uppercase tracking-wider">
+            <table class="w-full text-left table-fixed integrity-table">
+                <thead class="bg-gray-700 text-yellow-500 text-xs uppercase tracking-wider head-print-1">
                     <tr>
                         <th class="p-3 w-40 text-center border-r border-gray-600">Categoría</th>
                         <th colspan="2" class="p-3 text-center border-r border-gray-600">Artículo</th>
                         <th colspan="4" class="p-3 text-center">Planilla Financiera Contable ($/%)</th>
                     </tr>
                 </thead>
-                <thead class="bg-gray-600 text-white text-xs uppercase tracking-wider font-semibold">
+                <thead class="bg-gray-600 text-white text-xs uppercase tracking-wider font-semibold head-print-2">
                     <tr>
                         <th class="p-3 border-r border-gray-700">Rubro</th>
                         <th class="p-3 w-56 border-r border-gray-700">Nombre</th>
-                        <th class="p-3 w-80 border-r border-gray-700">Descripción / Ingredientes</th>
-                        <th class="p-3 w-36 text-center text-gray-400 bg-gray-600 border-r border-gray-700">Mes Anterior ($)</th>
-                        <th class="p-3 w-36 text-center text-blue-300 bg-blue-950/40 border-r border-gray-700">Precio Salón ($)</th>
-                        <th class="p-3 w-32 text-center text-green-300 bg-green-950/40 border-r border-gray-700">Incremento (%)</th>
-                        <th class="p-3 w-40 text-center text-red-300 bg-red-950/40">Take Away / PYa ($)</th>
+                        <th class="p-3 w-80 border-r border-gray-700 text-print-desc">Descripción / Ingredientes</th>
+                        <th class="p-3 w-36 text-center text-gray-400 bg-gray-600 border-r border-gray-700 cell-print-gray">Mes Anterior ($)</th>
+                        <th class="p-3 w-36 text-center text-blue-300 bg-blue-950/40 border-r border-gray-700 cell-print-blue">Precio Salón ($)</th>
+                        <th class="p-3 w-32 text-center text-green-300 bg-green-950/40 border-r border-gray-700 cell-print-green">Incremento (%)</th>
+                        <th class="p-3 w-40 text-center text-red-300 bg-red-950/40 cell-print-red">Take Away / PYa ($)</th>
                     </tr>
                 </thead>
                 
                 <tbody class="divide-y divide-gray-700 text-sm">
                     {% if productos %}
                         {% for producto in productos %}
-                        <tr class="fila-producto hover:bg-gray-750 transition {% if producto.activo == 0 %}opacity-40 bg-gray-900{% endif %}" data-rubro="{{ producto.id_rubro }}">
+                        <tr class="fila-producto hover:bg-gray-750 transition {% if producto.activo == 0 %}opacity-40 bg-gray-900 no-print{% endif %}" data-rubro="{{ producto.id_rubro }}">
                             
-                            <td class="p-3 border-r border-gray-700 font-medium text-gray-400 bg-gray-800 truncate">
+                            <td class="p-3 border-r border-gray-700 font-medium text-gray-400 bg-gray-800 truncate cell-print-clean">
                                 {{ producto.nombre_rubro or 'Sin Rubro' }}
                             </td>
-                            <td class="p-3 border-r border-gray-700 text-white font-bold bg-gray-800">
+                            <td class="p-3 border-r border-gray-700 text-white font-bold bg-gray-800 cell-print-clean font-print-dark">
                                 {{ producto.nombre_plato }}
                             </td>
-                            <td class="p-3 border-r border-gray-700 text-gray-400 text-xs italic bg-gray-800 truncate">
+                            <td class="p-3 border-r border-gray-700 text-gray-400 text-xs italic bg-gray-800 truncate cell-print-clean text-print-desc">
                                 {{ producto.descripcion or producto.descripcion_plato or 'Sin descripción' }}
                             </td>
                             
-                            <td class="p-2 border-r border-gray-700 bg-gray-700 text-gray-300 text-center font-mono font-bold">
+                            <td class="p-2 border-r border-gray-700 bg-gray-700 text-gray-300 text-center font-mono font-bold cell-print-clean-gray">
                                 $ <span class="precio-base-anterior">{{ "{:.2f}".format(producto.precio_efectivo_anterior or 0.00) }}</span>
                             </td>
                             
-                            <td class="p-2 border-r border-gray-700 bg-blue-950/40">
+                            <td class="p-2 border-r border-gray-700 bg-blue-950/40 cell-print-clean-input">
                                 <input type="number" step="0.01" name="precio_efectivo_{{ producto.id_precio_actual }}" 
                                        value="{{ producto.precio_efectivo_actual or producto.precio_efectivo_anterior or 0.00 }}" 
-                                       class="input-precio-salon w-full p-2 bg-blue-950 border border-blue-700 rounded text-blue-100 text-center font-bold font-mono focus:border-yellow-500 outline-none"
+                                       class="input-precio-salon w-full p-2 bg-blue-950 border border-blue-700 rounded text-blue-100 text-center font-bold font-mono focus:border-yellow-500 outline-none print-input-border"
                                        oninput="calcularDesdePrecio(this)">
                             </td>
                             
-                            <td class="p-2 border-r border-gray-700 bg-green-950/40">
+                            <td class="p-2 border-r border-gray-700 bg-green-950/40 cell-print-clean-input">
                                 <input type="number" step="0.01" name="porcentaje_diferencia_{{ producto.id_precio_actual }}" 
                                        value="{{ producto.porcentaje_incremento_actual or 0.00 }}" 
-                                       class="input-porcentaje-individual w-full p-2 bg-green-950 border border-green-700 rounded text-green-100 text-center font-bold font-mono focus:border-yellow-500 outline-none"
+                                       class="input-porcentaje-individual w-full p-2 bg-green-950 border border-green-700 rounded text-green-100 text-center font-bold font-mono focus:border-yellow-500 outline-none print-input-border"
                                        oninput="calcularDesdePorcentaje(this)">
                             </td>
                             
-                            <td class="p-2 bg-red-950/40">
+                            <td class="p-2 bg-red-950/40 cell-print-clean-input">
                                 <input type="number" step="0.01" name="precio_peya_{{ producto.id_precio_actual }}" 
                                        value="{{ producto.precio_peya_actual or 0.00 }}" 
-                                       class="input-precio-peya w-full p-2 bg-red-950 border border-red-700 rounded text-red-100 text-center font-bold font-mono focus:border-yellow-500 outline-none">
+                                       class="input-precio-peya w-full p-2 bg-red-950 border border-red-700 rounded text-red-100 text-center font-bold font-mono focus:border-yellow-500 outline-none print-input-border">
                             </td>
                         </tr>
                         {% endfor %}
@@ -181,7 +194,7 @@
             </table>
 
             {% if productos %}
-            <div id="contenedor-controles" class="fixed bottom-0 left-0 right-0 p-4 bg-gray-900 border-t border-gray-700 flex justify-between items-center shadow-2xl z-40">
+            <div id="contenedor-controles" class="fixed bottom-0 left-0 right-0 p-4 bg-gray-900 border-t border-gray-700 flex justify-between items-center shadow-2xl z-40 no-print">
                 <p class="text-xs text-gray-400 italic">
                     * Verifique los cálculos simulados en las columnas antes de presionar Guardar.
                 </p>
@@ -201,4 +214,100 @@
 </script>
 
 <script src="{{ url_for('static', filename='js/precios_masivos.js') }}"></script>
+
+<style>
+@media print {
+    /* 1. Limpieza absoluta de componentes web e inactivos */
+    .no-print, nav, sidebar, footer, #contenedor-controles, #panel-incrementos, select, button {
+        display: none !important;
+    }
+    
+    /* 2. Reseteo estructural para formato papel blanco */
+    body {
+        background: #ffffff !important;
+        color: #000000 !important;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
+        padding: 0 !important;
+        margin: 0 !important;
+    }
+
+    .max-w-7xl {
+        max-width: 100% !important;
+        width: 100% !important;
+        padding: 0 !important;
+        margin: 0 !important;
+    }
+
+    .printable-area {
+        border: none !important;
+        box-shadow: none !important;
+        background: transparent !important;
+    }
+
+    /* 3. Ajuste fino de tablas e inyección de contrastes legibles */
+    table.integrity-table {
+        width: 100% !important;
+        table-layout: fixed !important;
+        border-collapse: collapse !important;
+        color: #000000 !important;
+    }
+
+    thead.head-print-1 {
+        background-color: #111827 !important;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+    }
+    
+    thead.head-print-2 th {
+        background-color: #f3f4f6 !important;
+        color: #000000 !important;
+        border: 1px solid #d1d5db !important;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+    }
+
+    .cell-print-clean {
+        background: #ffffff !important;
+        color: #374151 !important;
+        border: 1px solid #e5e7eb !important;
+    }
+
+    .font-print-dark {
+        color: #000000 !important;
+        font-weight: 700 !important;
+    }
+
+    .cell-print-clean-gray {
+        background: #f9fafb !important;
+        color: #1f2937 !important;
+        border: 1px solid #d1d5db !important;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+    }
+
+    .text-print-desc {
+        max-width: 180px !important;
+        white-space: nowrap !important;
+        overflow: hidden !important;
+        text-overflow: ellipsis !important;
+    }
+
+    /* 4. Transformación de inputs a texto plano impreso */
+    .cell-print-clean-input {
+        background: #ffffff !important;
+        border: 1px solid #d1d5db !important;
+        padding: 4px !important;
+    }
+
+    input.print-input-border {
+        background: transparent !important;
+        border: none !important;
+        color: #000000 !important;
+        font-weight: bold !important;
+        text-align: center !important;
+        width: 100% !important;
+        padding: 0 !important;
+    }
+}
+</style>
 {% endblock %}
