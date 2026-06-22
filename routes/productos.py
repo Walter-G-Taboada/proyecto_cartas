@@ -104,27 +104,44 @@ def productos():
 
 @productos_bp.route('/guardar_producto', methods=['POST'])
 @login_requerido
-@requerir_roles(1, 2)  # 🔥 Solo deja pasar si session['rol'] == 1 y 2 (Admin) y Gerente
+@requerir_roles(1, 2)
 def guardar_producto():
+    # 1. Captura de datos del formulario
     id_rubro = request.form.get('id_rubro')
     id_categoria = request.form.get('id_categoria')
     codigo_plato = request.form.get('codigo').upper()
     nombre_plato = request.form.get('nombre')
+    descripcion = request.form.get('descripcion')
+    condicion = request.form.get('condicion')
     locales_seleccionados = [int(x) for x in request.form.getlist('locales_seleccionados')]
     mes_actual = datetime.datetime.now().strftime("%m-%Y")
     
     db = get_db_connection()
     cursor = db.cursor()
     try:
-        cursor.execute("INSERT INTO productos (id_rubro, id_categoria, codigo_plato, nombre_plato) VALUES (%s, %s, %s, %s)", 
-                       (id_rubro, id_categoria, codigo_plato, nombre_plato))
+        # 2. Sentencia SQL corregida (6 campos = 6 %s)
+        # Asegúrate que el orden aquí coincida con la tupla de datos abajo
+        query = """INSERT INTO productos 
+                   (id_rubro, id_categoria, codigo_plato, nombre_plato, descripcion, condicion) 
+                   VALUES (%s, %s, %s, %s, %s, %s)"""
+        
+        datos = (id_rubro, id_categoria, codigo_plato, nombre_plato, descripcion, condicion)
+        
+        cursor.execute(query, datos)
+        
         id_nuevo_producto = cursor.lastrowid
+        
+        # 3. Guardado de precios locales
         for id_local in locales_seleccionados:
-            cursor.execute("INSERT INTO precios_local (id_local, id_producto, precio_efectivo, precio_peya, porcentaje_diferencia, mes_vigencia, activo) VALUES (%s, %s, 0.00, 0.00, 0.00, %s, 1)", 
+            cursor.execute("""INSERT INTO precios_local 
+                              (id_local, id_producto, precio_efectivo, precio_peya, porcentaje_diferencia, mes_vigencia, activo) 
+                              VALUES (%s, %s, 0.00, 0.00, 0.00, %s, 1)""", 
                            (id_local, id_nuevo_producto, mes_actual))
         db.commit()
+        print("¡Producto guardado exitosamente!")
     except Exception as e:
-        print(f"Error: {e}"); db.rollback()
+        print(f"Error al guardar: {e}")
+        db.rollback()
     finally:
         cursor.close(); db.close()
     return redirect(url_for('productos.productos'))
@@ -165,13 +182,15 @@ def actualizar_producto():
     id_categoria = request.form.get('id_categoria')
     codigo_plato = request.form.get('codigo').upper()
     nombre_plato = request.form.get('nombre')
+    condicion = request.form.get('condicion')
+    descripcion = request.form.get('descripcion')
     locales_seleccionados = [int(x) for x in request.form.getlist('locales_seleccionados')]
     mes_actual = datetime.datetime.now().strftime("%m-%Y")
     
     db = get_db_connection()
     cursor = db.cursor()
     try:
-        cursor.execute("UPDATE productos SET id_rubro = %s, id_categoria = %s, codigo_plato = %s, nombre_plato = %s WHERE id_producto = %s", (id_rubro, id_categoria, codigo_plato, nombre_plato, id_producto))
+        cursor.execute("UPDATE productos SET id_rubro = %s, id_categoria = %s, codigo_plato = %s, nombre_plato =%s, condicion = %s, descripcion = %s, WHERE id_producto = %s", (id_rubro, id_categoria, codigo_plato, nombre_plato, id_producto))
         cursor.execute("SELECT id_local FROM precios_local WHERE id_producto = %s AND mes_vigencia = %s", (id_producto, mes_actual))
         locales_actuales_db = [row[0] for row in cursor.fetchall()]
         
